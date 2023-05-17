@@ -9,7 +9,7 @@ def intro():
     summarizer = pipeline("summarization")
     userInputText = st.text_input("enetr text that you want to summarise")
     summary = summarizer(userInputText, max_length=500, min_length=50, do_sample=False)
-    st.write(summary)
+    st.write(summary[0]['summary_text'])
 
 
 
