@@ -8,7 +8,7 @@ def intro():
     st.write("This is remarkable text summarizer! Unlock the power of condensing lengthy texts into concise summaries with just a few clicks. Effortlessly digest complex information as our tool analyzes and distills key points, saving you valuable time and effort. Impressively accurate and efficient, our text summarizer is your go-to companion for extracting essential insights from any document. Experience the convenience of quick summaries that enable you to grasp the essence of texts without any prior knowledge.")
     st.sidebar.success("Select a demo above.")
     summarizer = pipeline("summarization")
-    userInputText = st.text_input("enetr text that you want to summarise")
+    userInputText = st.text_input("enter text that you want to summarise")
     summary = summarizer(userInputText, max_length=500, min_length=50, do_sample=False)
     st.write(summary[0]['summary_text'])
 
