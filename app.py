@@ -56,7 +56,7 @@ st.dataframe(df)
 st.markdown("""
 ## ***"A picture is worth more than a thousand words"***
 """)
-userInputText = st.text_input("enetr text that you want to summarise")
-print(userInputText)
+
+
 
 
