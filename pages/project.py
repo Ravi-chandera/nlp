@@ -1,5 +1,7 @@
 import streamlit as st
 from transformers import pipeline
+from urllib.error import URLError
+from PIL import Image
 
 def intro():
     import streamlit as st
@@ -9,7 +11,7 @@ def intro():
     st.sidebar.success("Select a demo above.")
     summarizer = pipeline("summarization")
     userInputText = st.text_input("enetr text that you want to summarise")
-    summary = summarizer(userInputText, max_length=500, min_length=50, do_sample=False)
+    summary = summarizer(userInputText, max_length=1000, min_length=150, do_sample=False)
     st.write(summary[0]['summary_text'])
 
 
@@ -17,102 +19,68 @@ def intro():
 
    
 
-# def mapping_demo():
-#     import streamlit as st
-#     import pandas as pd
-#     import pydeck as pdk
+def mapping_demo():
+    try:
+        model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+        feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+        tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
 
-#     from urllib.error import URLError
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        model.to(device)
+        max_length = 16
+        num_beams = 4
+        gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
+        def predict_step(image_paths):
+            images = []
+            for image_path in image_paths:
+                i_image = Image.open(image_path)
+                if i_image.mode != "RGB":
+                    i_image = i_image.convert(mode="RGB")
 
-#     st.markdown(f"# {list(page_names_to_funcs.keys())[2]}")
-#     st.write(
-#         """
-#         This demo shows how to use
-# [`st.pydeck_chart`](https://docs.streamlit.io/library/api-reference/charts/st.pydeck_chart)
-# to display geospatial data.
-# """
-#     )
+                images.append(i_image)
 
-#     @st.cache_data
-#     def from_data_file(filename):
-#         url = (
-#             "http://raw.githubusercontent.com/streamlit/"
-#             "example-data/master/hello/v1/%s" % filename
-#         )
-#         return pd.read_json(url)
+            pixel_values = feature_extractor(images=images, return_tensors="pt").pixel_values
+            pixel_values = pixel_values.to(device)
 
-#     try:
-#         ALL_LAYERS = {
-#             "Bike Rentals": pdk.Layer(
-#                 "HexagonLayer",
-#                 data=from_data_file("bike_rental_stats.json"),
-#                 get_position=["lon", "lat"],
-#                 radius=200,
-#                 elevation_scale=4,
-#                 elevation_range=[0, 1000],
-#                 extruded=True,
-#             ),
-#             "Bart Stop Exits": pdk.Layer(
-#                 "ScatterplotLayer",
-#                 data=from_data_file("bart_stop_stats.json"),
-#                 get_position=["lon", "lat"],
-#                 get_color=[200, 30, 0, 160],
-#                 get_radius="[exits]",
-#                 radius_scale=0.05,
-#             ),
-#             "Bart Stop Names": pdk.Layer(
-#                 "TextLayer",
-#                 data=from_data_file("bart_stop_stats.json"),
-#                 get_position=["lon", "lat"],
-#                 get_text="name",
-#                 get_color=[0, 0, 0, 200],
-#                 get_size=15,
-#                 get_alignment_baseline="'bottom'",
-#             ),
-#             "Outbound Flow": pdk.Layer(
-#                 "ArcLayer",
-#                 data=from_data_file("bart_path_stats.json"),
-#                 get_source_position=["lon", "lat"],
-#                 get_target_position=["lon2", "lat2"],
-#                 get_source_color=[200, 30, 0, 160],
-#                 get_target_color=[200, 30, 0, 160],
-#                 auto_highlight=True,
-#                 width_scale=0.0001,
-#                 get_width="outbound",
-#                 width_min_pixels=3,
-#                 width_max_pixels=30,
-#             ),
-#         }
-#         st.sidebar.markdown("### Map Layers")
-#         selected_layers = [
-#             layer
-#             for layer_name, layer in ALL_LAYERS.items()
-#             if st.sidebar.checkbox(layer_name, True)
-#         ]
-#         if selected_layers:
-#             st.pydeck_chart(
-#                 pdk.Deck(
-#                     map_style="mapbox://styles/mapbox/light-v9",
-#                     initial_view_state={
-#                         "latitude": 37.76,
-#                         "longitude": -122.4,
-#                         "zoom": 11,
-#                         "pitch": 50,
-#                     },
-#                     layers=selected_layers,
-#                 )
-#             )
-#         else:
-#             st.error("Please choose at least one layer above.")
-#     except URLError as e:
-#         st.error(
-#             """
-#             **This demo requires internet access.**
+            output_ids = model.generate(pixel_values, **gen_kwargs)
 
-#             Connection error: %s
-#         """
-#             % e.reason
-#         )
+            preds = tokenizer.batch_decode(output_ids, skip_special_tokens=True)
+            preds = [pred.strip() for pred in preds]
+        return preds
+
+        
+    except URLError as e:
+        st.error(
+            """
+            **This demo requires internet access.**
+
+            Connection error: %s
+        """
+            % e.reason
+        )
+    import streamlit as st
+
+# Title or introduction for the app
+    st.title("Image Uploader")
+
+# Create a file uploader widget
+    uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
+
+# Check if the user has uploaded a file
+    if uploaded_file is not None:
+    # Display the uploaded image
+        st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
+    
+    # Perform further processing on the uploaded image (e.g., image classification, object detection, etc.)
+    # Add your own code here to process the image
+    
+    # Example: You can save the uploaded image to a file
+        with open("uploaded_image.jpg", "wb") as f:
+            f.write(uploaded_file.getbuffer())
+            st.success("Image saved successfully!")
+    output = predict_step([uploaded_file]) 
+    st.write(output)
+
 
 # def plotting_demo():
 #     import streamlit as st
