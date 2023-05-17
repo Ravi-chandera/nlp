@@ -2,6 +2,8 @@ import streamlit as st
 from transformers import pipeline
 from urllib.error import URLError
 from PIL import Image
+from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+import torch
 
 def intro():
     import streamlit as st
