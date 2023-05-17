@@ -7,8 +7,8 @@ def intro():
     st.write("# Welcome to Streamlit! 👋")
     st.sidebar.success("Select a demo above.")
     summarizer = pipeline("summarization")
-    ARTICLE = input()
-    summary = summarizer(ARTICLE, max_length=500, min_length=50, do_sample=False)
+    userInputText = st.text_input("enetr text that you want to summarise")
+    summary = summarizer(userInputText, max_length=500, min_length=50, do_sample=False)
     st.write(summary)
 
 
