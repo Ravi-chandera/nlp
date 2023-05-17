@@ -2,8 +2,7 @@ import streamlit as st
 from transformers import pipeline
 from urllib.error import URLError
 from PIL import Image
-from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
-import torch
+
 
 def intro():
     import streamlit as st
@@ -22,6 +21,8 @@ def intro():
    
 
 def mapping_demo():
+    from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+    import torch
     try:
         model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
         feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
