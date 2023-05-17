@@ -20,69 +20,69 @@ def intro():
 
    
 
-def mapping_demo():
-    from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
-    import torch
-    try:
-        model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-        feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-        tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+# def mapping_demo():
+#     from transformers import VisionEncoderDecoderModel, ViTImageProcessor, AutoTokenizer
+#     import torch
+#     try:
+#         model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+#         feature_extractor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
+#         tokenizer = AutoTokenizer.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
 
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        model.to(device)
-        max_length = 16
-        num_beams = 4
-        gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
-        def predict_step(image_paths):
-            images = []
-            for image_path in image_paths:
-                i_image = Image.open(image_path)
-                if i_image.mode != "RGB":
-                    i_image = i_image.convert(mode="RGB")
+#         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#         model.to(device)
+#         max_length = 16
+#         num_beams = 4
+#         gen_kwargs = {"max_length": max_length, "num_beams": num_beams}
+#         def predict_step(image_paths):
+#             images = []
+#             for image_path in image_paths:
+#                 i_image = Image.open(image_path)
+#                 if i_image.mode != "RGB":
+#                     i_image = i_image.convert(mode="RGB")
 
-                images.append(i_image)
+#                 images.append(i_image)
 
-            pixel_values = feature_extractor(images=images, return_tensors="pt").pixel_values
-            pixel_values = pixel_values.to(device)
+#             pixel_values = feature_extractor(images=images, return_tensors="pt").pixel_values
+#             pixel_values = pixel_values.to(device)
 
-            output_ids = model.generate(pixel_values, **gen_kwargs)
+#             output_ids = model.generate(pixel_values, **gen_kwargs)
 
-            preds = tokenizer.batch_decode(output_ids, skip_special_tokens=True)
-            preds = [pred.strip() for pred in preds]
-        return preds
+#             preds = tokenizer.batch_decode(output_ids, skip_special_tokens=True)
+#             preds = [pred.strip() for pred in preds]
+#         return preds
 
         
-    except URLError as e:
-        st.error(
-            """
-            **This demo requires internet access.**
+#     except URLError as e:
+#         st.error(
+#             """
+#             **This demo requires internet access.**
 
-            Connection error: %s
-        """
-            % e.reason
-        )
-    import streamlit as st
+#             Connection error: %s
+#         """
+#             % e.reason
+#         )
+#     import streamlit as st
 
-# Title or introduction for the app
-    st.title("Image Uploader")
+# # Title or introduction for the app
+#     st.title("Image Uploader")
 
-# Create a file uploader widget
-    uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
+# # Create a file uploader widget
+#     uploaded_file = st.file_uploader("Choose an image", type=["jpg", "jpeg", "png"])
 
-# Check if the user has uploaded a file
-    if uploaded_file is not None:
-    # Display the uploaded image
-        st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
+# # Check if the user has uploaded a file
+#     if uploaded_file is not None:
+#     # Display the uploaded image
+#         st.image(uploaded_file, caption='Uploaded Image', use_column_width=True)
     
-    # Perform further processing on the uploaded image (e.g., image classification, object detection, etc.)
-    # Add your own code here to process the image
+#     # Perform further processing on the uploaded image (e.g., image classification, object detection, etc.)
+#     # Add your own code here to process the image
     
-    # Example: You can save the uploaded image to a file
-        with open("uploaded_image.jpg", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-            st.success("Image saved successfully!")
-    output = predict_step([uploaded_file]) 
-    st.write(output)
+#     # Example: You can save the uploaded image to a file
+#         with open("uploaded_image.jpg", "wb") as f:
+#             f.write(uploaded_file.getbuffer())
+#             st.success("Image saved successfully!")
+#     output = predict_step([uploaded_file]) 
+#     st.write(output)
 
 
 # def plotting_demo():
@@ -181,7 +181,7 @@ def mapping_demo():
 page_names_to_funcs = {
     "—": intro,
     # "Plotting Demo": plotting_demo,
-    "Mapping Demo": mapping_demo,
+#     "Mapping Demo": mapping_demo,
     # "DataFrame Demo": data_frame_demo
 }
 
