@@ -4,7 +4,7 @@ import pandas as pd
 
 st.set_page_config(
     page_title = "multiple pages",
-    page_icon = "🤣",
+    # page_icon = "🤣",
 )
 st.title("Main page")
 st.sidebar.success("Select above page")
